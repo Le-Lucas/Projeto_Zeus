@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS_NOIR_V15_DNA_FIXED</title>
+    <title>ZEUS_NOIR_V15_FIREBASE</title>
     <style>
         body { background-color: #0d0d0d; color: #b3b3b3; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; overflow: hidden; }
         
@@ -20,59 +20,13 @@
         @keyframes brilhoFluxo { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
 
         /* --- ANIMAÇÃO DNA 3D --- */
-        #dnaOverlay { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            pointer-events: none; 
-            z-index: 1; 
-            display: block; /* Começa visível se vazio */
-        }
-
-        .dna-container { 
-            position: absolute; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            display: flex; 
-            gap: 50px; 
-            perspective: 1000px; 
-            opacity: 0.15; 
-        }
-
-        .dna-strand { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            animation: rotateDNA 6s linear infinite; 
-            transform-style: preserve-3d; 
-        }
-
-        .dna-dot { 
-            width: 10px; 
-            height: 10px; 
-            background: #800000; 
-            border-radius: 50%; 
-            box-shadow: 0 0 15px #ff0000; 
-        }
-
+        #dnaOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; display: block; }
+        .dna-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 50px; perspective: 1000px; opacity: 0.15; }
+        .dna-strand { display: flex; flex-direction: column; gap: 20px; animation: rotateDNA 6s linear infinite; transform-style: preserve-3d; }
+        .dna-dot { width: 10px; height: 10px; background: #ff0000; border-radius: 50%; box-shadow: 0 0 15px #ff0000; }
         .strand-2 { animation-delay: -3s; }
-
-        @keyframes rotateDNA { 
-            0% { transform: rotateY(0deg); } 
-            100% { transform: rotateY(360deg); } 
-        }
-
-        .empty-state { 
-            position: absolute; 
-            top: 75%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            color: #444; 
-            letter-spacing: 10px; 
-            font-size: 0.8rem; 
-            text-align: center; 
-            text-transform: uppercase;
-            width: 100%;
-        }
+        @keyframes rotateDNA { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        .empty-state { position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); color: #444; letter-spacing: 10px; font-size: 0.8rem; text-align: center; text-transform: uppercase; width: 100%; }
 
         /* --- INTERFACE --- */
         .menu-toggle { position: fixed; top: 20px; left: 20px; z-index: 2000; background: #800000; color: white; border: none; padding: 10px 15px; cursor: pointer; font-weight: bold; box-shadow: 3px 3px 0px #330000; }
@@ -111,20 +65,19 @@
         input, textarea, select { background: #000; border: 1px solid #333; color: #fff; padding: 8px; width: 100%; margin-bottom: 5px; font-family: inherit; }
         .cmd-btn { background: #800000; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
 
-        .ruido-estatico { position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.04; z-index: 9999; pointer-events: none; animation: estatica 0.2s infinite; }
+        .ruido-estatico { position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.04; z-index: 9999; pointer-events: none; animation: estatica 0.2s infinite; }
         @keyframes estatica { 0%, 100% { transform: translate(0,0) } 50% { transform: translate(-1%, 1%) } }
     </style>
 </head>
 <body>
 
 <div class="ruido-estatico"></div>
-<!-- O DNA É INJETADO AQUI -->
 <div id="dnaOverlay"></div>
 
 <button class="menu-toggle" onclick="toggleSidebar()">MENU</button>
 
 <div class="sidebar" id="sidebar">
-    <div style="color:#800000; font-size:1.1rem; margin-bottom:20px;">ZEUS_CORE_v15</div>
+    <div style="color:#800000; font-size:1.1rem; margin-bottom:20px;">ZEUS_CORE_v15_FIRE</div>
     <div class="sidebar-links">
         <div onclick="changeCat('cronica')">> CRÔNICA</div>
         <div onclick="changeCat('personagens')">> PERSONAGENS</div>
@@ -155,38 +108,60 @@
     </div>
 </div>
 
-<script>
-    let currentCat = 'cronica', editingIdx = null;
+<script type="module">
+    // --- FIREBASE CONFIG & INIT ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpyI6-fn-w4IniDlVI0A1xEzyGn__iOTQ",
+      authDomain: "projeto-zeus-a2f3e.firebaseapp.com",
+      projectId: "projeto-zeus-a2f3e",
+      storageBucket: "projeto-zeus-a2f3e.firebasestorage.app",
+      messagingSenderId: "869815347699",
+      appId: "1:869815347699:web:492f6278f9a7dde1858a86"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const fs = getFirestore(app);
+
+    // --- ESTADO GLOBAL ---
+    window.currentCat = 'cronica';
+    window.editingIdx = null;
+    window.db = { cronica:[], personagens:[], projeto_zeus:[], figuras:[], resistencia:[] };
     let tempSkills = [], tempGear = [], tempTraits = [];
-    let db = JSON.parse(localStorage.getItem('zeus_v15_fixed')) || { cronica:[], personagens:[], projeto_zeus:[], figuras:[], resistencia:[] };
 
-    const getDots = (n, max=5) => "●".repeat(n) + "○".repeat(max - n);
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-    function changeCat(cat) { currentCat = cat; document.getElementById('displayTitle').innerText = cat.replace('_', ' ').toUpperCase(); render(); toggleSidebar(); }
-
-    function createDNA() {
-        const overlay = document.getElementById('dnaOverlay');
-        overlay.innerHTML = `
-            <div class="dna-container">
-                <div class="dna-strand" id="s1"></div>
-                <div class="dna-strand strand-2" id="s2"></div>
-            </div>
-            <div class="empty-state">AGUARDANDO_SINCRONIZAÇÃO_DE_DADOS...</div>
-        `;
-        const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
-        for(let i=0; i<12; i++) {
-            const d1 = document.createElement('div'); d1.className = 'dna-dot'; d1.style.transform = `translateZ(60px)`;
-            const d2 = document.createElement('div'); d2.className = 'dna-dot'; d2.style.transform = `translateZ(-60px)`;
-            s1.appendChild(d1); s2.appendChild(d2);
+    // --- SINCRONIZAÇÃO EM TEMPO REAL ---
+    const docRef = doc(fs, "sistema", "zeus_v15_data");
+    onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            window.db = docSnap.data();
+            render();
+        } else {
+            persist(); 
         }
+    });
+
+    async function persist() {
+        await setDoc(doc(fs, "sistema", "zeus_v15_data"), window.db);
     }
 
-    function openAddModal(idx = null) {
-        editingIdx = idx;
-        const b = document.getElementById('modalBody');
-        const item = idx !== null ? db[currentCat][idx] : null;
+    // --- FUNÇÕES DE UI ---
+    window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
+    
+    window.changeCat = (cat) => { 
+        window.currentCat = cat; 
+        document.getElementById('displayTitle').innerText = cat.replace('_', ' ').toUpperCase(); 
+        render(); 
+        window.toggleSidebar(); 
+    };
 
-        if(currentCat === 'personagens') {
+    window.openAddModal = (idx = null) => {
+        window.editingIdx = idx;
+        const b = document.getElementById('modalBody');
+        const item = idx !== null ? window.db[window.currentCat][idx] : null;
+
+        if(window.currentCat === 'personagens') {
             tempSkills = item ? [...item.skills] : [];
             tempGear = item ? [...item.gear] : [];
             tempTraits = item ? [...item.traits] : [];
@@ -207,42 +182,53 @@
                     <input type="text" id="iName" placeholder="Nome">
                     <input type="number" id="iVal" value="1" max="5">
                     <select id="iType"><option value="skill">Habilidade</option><option value="gear">Equipamento</option><option value="trait">Vant/Def</option></select>
-                    <button onclick="addToTemp()" class="cmd-btn">ADD</button></div>
+                    <button id="btnAddTemp" class="cmd-btn">ADD</button></div>
                     <div id="previewList" style="font-size:0.6rem; border:1px dashed #333; padding:5px; height:180px; overflow-y:auto;">${tempSkills.length + tempGear.length + tempTraits.length} itens registrados.</div>
-                </div><button class="cmd-btn" onclick="saveCharacter()">GRAVAR</button><button class="cmd-btn" style="background:#222" onclick="closeModal()">CANCELAR</button>`;
+                </div><button class="cmd-btn" id="btnSaveChar">GRAVAR</button><button class="cmd-btn" style="background:#222" onclick="closeModal()">CANCELAR</button>`;
+            
+            document.getElementById('btnAddTemp').onclick = addToTemp;
+            document.getElementById('btnSaveChar').onclick = saveCharacter;
         } else {
-            b.innerHTML = `<h3>[ ${idx !== null ? 'EDITAR' : 'NOVO'} ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL IMAGEM" value="${item?(item.img||''):''}"><textarea id="gText" rows="12">${item?item.text:''}</textarea><button class="cmd-btn" onclick="saveGeneral()">SINCRONIZAR</button>`;
+            b.innerHTML = `<h3>[ ${idx !== null ? 'EDITAR' : 'NOVO'} ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL IMAGEM" value="${item?(item.img||''):''}"><textarea id="gText" rows="12">${item?item.text:''}</textarea><button class="cmd-btn" id="btnSaveGen">SINCRONIZAR</button>`;
+            document.getElementById('btnSaveGen').onclick = saveGeneral;
         }
         document.getElementById('ctxModal').style.display = 'flex';
-    }
+    };
 
     function addToTemp() {
         const n = document.getElementById('iName').value, v = document.getElementById('iVal').value, t = document.getElementById('iType').value;
-        if(n) { if(t === 'skill') tempSkills.push({n, v}); else if(t === 'gear') tempGear.push({n, v}); else tempTraits.push({n, v});
-        document.getElementById('previewList').innerHTML = `${tempSkills.length + tempGear.length + tempTraits.length} itens registrados.`; document.getElementById('iName').value = ''; }
+        if(n) { 
+            if(t === 'skill') tempSkills.push({n, v}); else if(t === 'gear') tempGear.push({n, v}); else tempTraits.push({n, v});
+            document.getElementById('previewList').innerHTML = `${tempSkills.length + tempGear.length + tempTraits.length} itens registrados.`; 
+            document.getElementById('iName').value = ''; 
+        }
     }
 
     function saveCharacter() {
         const data = { name: document.getElementById('cName').value || 'NULO', img: document.getElementById('cImg').value || '', phys: { For: document.getElementById('cFor').value, Des: document.getElementById('cDes').value, Vig: document.getElementById('cVig').value }, soc: { Car: document.getElementById('cCar').value, Man: document.getElementById('cMan').value, Apa: document.getElementById('cApa').value }, ment: { Per: document.getElementById('cPer').value, Int: document.getElementById('cInt').value, Rac: document.getElementById('cRac').value }, virt: { Con: document.getElementById('vCns').value, Aut: document.getElementById('vAut').value, Cor: document.getElementById('vCor').value }, vitals: { Hum: document.getElementById('vHum').value, Will: document.getElementById('vVon').value, Cor: document.getElementById('vCrp').value }, skills: tempSkills, gear: tempGear, traits: tempTraits };
-        if(editingIdx !== null) db.personagens[editingIdx] = data; else db.personagens.push(data);
+        if(window.editingIdx !== null) window.db.personagens[window.editingIdx] = data; else window.db.personagens.push(data);
         persist();
+        window.closeModal();
     }
 
     function saveGeneral() {
         const data = { title: document.getElementById('gTitle').value, text: document.getElementById('gText').value, img: document.getElementById('gImg').value || '', date: new Date().toLocaleDateString() };
-        if(editingIdx !== null) db[currentCat][editingIdx] = data; else db[currentCat].push(data);
+        if(window.editingIdx !== null) window.db[window.currentCat][window.editingIdx] = data; else window.db[window.currentCat].push(data);
         persist();
+        window.closeModal();
     }
 
-    function deleteItem(idx) { if(confirm("Purgar registro?")) { db[currentCat].splice(idx, 1); persist(); } }
-    function persist() { localStorage.setItem('zeus_v15_fixed', JSON.stringify(db)); render(); document.getElementById('ctxModal').style.display = 'none'; editingIdx = null; }
-    function closeModal() { document.getElementById('ctxModal').style.display = 'none'; }
+    window.deleteItem = (idx) => { if(confirm("Purgar registro?")) { window.db[window.currentCat].splice(idx, 1); persist(); } };
+    window.closeModal = () => { document.getElementById('ctxModal').style.display = 'none'; };
+    window.clearCat = () => { if(confirm("Purgar arquivos desta aba?")) { window.db[window.currentCat] = []; persist(); } };
 
+    // --- RENDERIZAÇÃO ---
+    const getDots = (n, max=5) => "●".repeat(n) + "○".repeat(max - n);
     const obs = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('show', e.isIntersecting)), { threshold: 0.4 });
 
     function render() {
         const f = document.getElementById('chronicleFeed'); f.innerHTML = '';
-        const data = db[currentCat];
+        const data = window.db[window.currentCat] || [];
         const dna = document.getElementById('dnaOverlay');
 
         if (data.length === 0) { 
@@ -256,20 +242,5 @@
             const card = document.createElement('div'); card.className = 'sessao-card hidden';
             const controls = `<div class="card-controls"><div class="control-btn" onclick="openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red" onclick="deleteItem(${i})">X</div></div>`;
             
-            if(currentCat === 'personagens') {
-                card.innerHTML = `${controls}<div style="display:flex; gap:20px; width:100%; max-width:950px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com'}"></div><div style="flex:1;"><h2 class="shimmer-text" style="font-size:1.8rem; text-align:left;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="sheet-grid" style="margin-top:5px;"><div class="category-box"><h4>VIRTUDES</h4>${Object.entries(item.virt).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box" style="grid-column: span 2;"><h4>MÉTRICAS</h4><div class="stat-row"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div><div class="stat-row"><span>VONTADE</span><span class="dots">${getDots(item.vitals.Will, 10)}</span> | <span style="color:red">CORRUPÇÃO</span><span class="dots">${getDots(item.vitals.Cor, 10)}</span></div></div></div></div></div><div class="sheet-grid" style="width:100%; max-width:950px; margin-top:5px;"><div class="category-box"><h4>HABILIDADES</h4>${item.skills.map(s=>`<div class="stat-row"><span>${s.n}</span><span class="dots">${getDots(s.v)}</span></div>`).join('')}</div><div class="category-box"><h4>ITENS</h4>${item.gear.map(g=>`<div class="stat-row"><span>${g.n}</span><span class="dots">${getDots(g.v)}</span></div>`).join('')}</div></div>`;
-            } else if(currentCat === 'figuras') {
-                card.innerHTML = `${controls}<div class="img-container"><img src="${item.img || 'https://via.placeholder.com'}"></div><h2 class="shimmer-text">${item.title}</h2><button class="btn-access shimmer-text" onclick="openReadModal('${item.title}', '${item.text.replace(/\n/g, '\\n')}')">[ ACESSAR_INTELIGÊNCIA ]</button>`;
-            } else {
-                card.innerHTML = `${controls}<div style="color:#800000; font-size:0.7rem;">[ REGISTRO_${item.date} ]</div><h2 class="shimmer-text">${item.title}</h2><div class="resume-text">${item.text}</div><button class="btn-access shimmer-text" onclick="openReadModal('${item.title}', '${item.text.replace(/\n/g, '\\n')}')">[ ACESSAR_ARQUIVO ]</button>`;
-            }
-            f.prepend(card); obs.observe(card);
-        });
-    }
-
-    function openReadModal(title, text) { document.getElementById('readTitle').innerText = title; document.getElementById('readFullText').innerText = text.replace(/\\n/g, '\n'); document.getElementById('readModal').style.display = 'flex'; }
-    function clearCat() { if(confirm("Purgar arquivos desta aba?")) { db[currentCat] = []; persist(); } }
-    render();
-</script>
-</body>
-</html>
+            if(window.currentCat === 'personagens') {
+                card.innerHTML = `${controls}<div style="display:flex; gap:20px; width:100%; max-width:950px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com/200'}"></div><div style="flex:1;"><h2 class="shimmer-text" style="font-size:1.8rem; text-align:left;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="sheet-grid" style="margin-top:5px;"><div class="category-box"><h4>VIRTUDES</h4>${Object.entries(item.virt).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box" style="grid-column: span 2;"><h4>MÉTRICAS</h4><div class="stat-row"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div><div class="stat-row"><span>VONTADE</span><span class="dots">${getDots(item.vitals.Will, 10)}</span> | <span style="color:red">CORRUPÇÃO</span><span class="dots">${getDots(item.vitals.Cor, 10)}</span></div></div></div></div></div><div class="sheet-grid" style="width:100%; max-width:950px; margin-top:5px;"><div class="category-box"><h4>HABILIDADES</h4>${item.skills.map(s=>`<div class="stat-row"><span>${s.n}</span><span class="dots">${getDots(s.v)}</span></div>`).join('')}</div><div class="category-box"><h4>ITENS</h4>${item.gear.map(g=>`<div class="stat-row"><span>${g.n}</span><span class="dots">${getDots(g.v
