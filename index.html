@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS_NOIR_V15_FINAL_FIX</title>
+    <title>ZEUS_NOIR_V15_NEON_EDITION</title>
     <style>
         body { background-color: #0d0d0d; color: #b3b3b3; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; overflow-x: hidden; }
         
@@ -49,19 +49,30 @@
         .category-box { border: 1px solid #222; padding: 6px; background: rgba(255,255,255,0.01); }
         .category-box h4 { border-bottom: 1px solid #800000; color: #fff; font-size: 0.65rem; margin-bottom: 5px; }
         .stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; }
-        .dots { color: #800000; }
+        .dots { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
 
-        /* --- MODAL --- */
+        /* --- MODAL COM AJUSTE NEON --- */
         .modal { display: none; position: fixed; z-index: 5000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-        .modal-content { background: #0a0a0a; border: 1px solid #800000; padding: 20px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: #0a0a0a; border: 1px solid #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); padding: 20px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
         
-        .attr-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; border: 1px solid #222; padding: 10px; }
+        .neon-label { 
+            font-size: 0.75rem; 
+            color: #ff3333; 
+            text-shadow: 0 0 8px #ff0000; 
+            font-weight: bold; 
+            text-transform: uppercase;
+        }
+        
+        .attr-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; border: 1px solid #330000; padding: 10px; background: rgba(255,0,0,0.02); }
         .attr-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .attr-row label { font-size: 0.7rem; width: 40px; color: #800000; font-weight: bold; }
-        .attr-row input { width: 60px !important; text-align: center; }
+        .attr-row label { width: 45px; } /* Usa a classe neon-label via JS */
+        .attr-row input { width: 65px !important; text-align: center; border-color: #440000; }
         
         input, textarea, select { background: #000; border: 1px solid #333; color: #fff; padding: 8px; width: 100%; margin-bottom: 5px; font-family: inherit; box-sizing: border-box; }
-        .cmd-btn { background: #800000; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; font-weight: bold; }
+        input:focus { border-color: #ff0000; outline: none; box-shadow: 0 0 5px #ff0000; }
+
+        .cmd-btn { background: #800000; color: white; border: 1px solid #ff0000; padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; font-weight: bold; text-shadow: 0 0 5px #000; transition: 0.3s; }
+        .cmd-btn:hover { background: #ff0000; box-shadow: 0 0 15px #ff0000; }
 
         .ruido-estatico { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.03; z-index: 9999; pointer-events: none; }
     </style>
@@ -74,7 +85,7 @@
 <button class="menu-toggle" onclick="window.toggleSidebar()">MENU</button>
 
 <div class="sidebar" id="sidebar">
-    <div style="color:#800000; font-size:1.1rem; margin-bottom:20px;">ZEUS_v15_CORE</div>
+    <div style="color:#ff0000; font-size:1.1rem; margin-bottom:20px; text-shadow: 0 0 10px #ff0000;">ZEUS_v15_NEON</div>
     <div class="sidebar-links">
         <div onclick="window.changeCat('cronica')">> CRÔNICA</div>
         <div onclick="window.changeCat('personagens')">> PERSONAGENS</div>
@@ -88,7 +99,7 @@
 
 <div style="text-align:center; padding: 15px; border-bottom: 1px solid #1a1a1a;">
     <h3 class="shimmer-text" id="displayTitle" style="font-size: 1.5rem; letter-spacing: 5px;">CRÔNICA</h3>
-    <span class="add-trigger" onclick="window.openAddModal()">[ + ]</span>
+    <span class="add-trigger" onclick="window.openAddModal()" style="color:#ff0000; text-shadow: 0 0 10px #ff0000;">[ + ]</span>
 </div>
 
 <div class="carousel-vertical" id="chronicleFeed"></div>
@@ -98,9 +109,9 @@
 </div>
 
 <div id="readModal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" style="border-color: #ff0000;" onclick="event.stopPropagation()">
+    <div class="modal-content" style="border-color: #ff0000; box-shadow: 0 0 30px rgba(255,0,0,0.3);" onclick="event.stopPropagation()">
         <h2 id="readTitle" class="shimmer-text"></h2>
-        <p id="readFullText" style="white-space: pre-wrap; color: #fff;"></p>
+        <p id="readFullText" style="white-space: pre-wrap; color: #fff; line-height: 1.6;"></p>
         <button class="cmd-btn" onclick="document.getElementById('readModal').style.display='none'">FECHAR</button>
     </div>
 </div>
@@ -122,11 +133,9 @@
     const fs = getFirestore(app);
 
     window.currentCat = 'cronica';
-    window.editingIdx = null;
     window.db = { cronica:[], personagens:[], projeto_zeus:[], figuras:[], resistencia:[] };
     let tempSkills = [], tempGear = [];
 
-    // --- FIREBASE SYNC ---
     const docRef = doc(fs, "sistema", "zeus_v15_data");
     onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
@@ -137,7 +146,6 @@
 
     async function persist() { await setDoc(docRef, window.db); }
 
-    // --- FUNÇÕES GLOBAIS (ANEXADAS AO WINDOW) ---
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
     
     window.changeCat = (cat) => { 
@@ -159,58 +167,58 @@
             tempGear = item ? [...item.gear] : [];
             
             b.innerHTML = `
-                <h3 style="color:#800000; font-size:0.9rem;">[ REGISTRO_DNA_PJ ]</h3>
+                <h3 class="neon-label" style="font-size:1.1rem; margin-bottom:15px;">[ REGISTRO_DNA_PJ ]</h3>
                 <input type="text" id="cName" placeholder="NOME DO INDIVÍDUO" value="${item ? item.name : ''}">
                 <input type="text" id="cImg" placeholder="URL_AVATAR" value="${item ? item.img : ''}">
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:10px;">
                     <div>
                         <div class="attr-group">
-                            <h5 style="margin:0 0 5px 0; font-size:0.6rem; color:#800000;">FÍSICOS</h5>
-                            <div class="attr-row"><label>FOR</label><input type="number" id="cFor" value="${item?item.phys.For:1}"></div>
-                            <div class="attr-row"><label>DES</label><input type="number" id="cDes" value="${item?item.phys.Des:1}"></div>
-                            <div class="attr-row"><label>VIG</label><input type="number" id="cVig" value="${item?item.phys.Vig:1}"></div>
+                            <h5 class="neon-label" style="margin:0 0 8px 0; font-size:0.6rem;">FÍSICOS</h5>
+                            <div class="attr-row"><label class="neon-label">FOR</label><input type="number" id="cFor" value="${item?item.phys.For:1}"></div>
+                            <div class="attr-row"><label class="neon-label">DES</label><input type="number" id="cDes" value="${item?item.phys.Des:1}"></div>
+                            <div class="attr-row"><label class="neon-label">VIG</label><input type="number" id="cVig" value="${item?item.phys.Vig:1}"></div>
                         </div>
                         <div class="attr-group">
-                            <h5 style="margin:0 0 5px 0; font-size:0.6rem; color:#800000;">SOCIAIS</h5>
-                            <div class="attr-row"><label>CAR</label><input type="number" id="cCar" value="${item?item.soc.Car:1}"></div>
-                            <div class="attr-row"><label>MAN</label><input type="number" id="cMan" value="${item?item.soc.Man:1}"></div>
-                            <div class="attr-row"><label>APA</label><input type="number" id="cApa" value="${item?item.soc.Apa:1}"></div>
+                            <h5 class="neon-label" style="margin:0 0 8px 0; font-size:0.6rem;">SOCIAIS</h5>
+                            <div class="attr-row"><label class="neon-label">CAR</label><input type="number" id="cCar" value="${item?item.soc.Car:1}"></div>
+                            <div class="attr-row"><label class="neon-label">MAN</label><input type="number" id="cMan" value="${item?item.soc.Man:1}"></div>
+                            <div class="attr-row"><label class="neon-label">APA</label><input type="number" id="cApa" value="${item?item.soc.Apa:1}"></div>
                         </div>
                     </div>
                     <div>
                         <div class="attr-group">
-                            <h5 style="margin:0 0 5px 0; font-size:0.6rem; color:#800000;">MENTAIS</h5>
-                            <div class="attr-row"><label>PER</label><input type="number" id="cPer" value="${item?item.ment.Per:1}"></div>
-                            <div class="attr-row"><label>INT</label><input type="number" id="cInt" value="${item?item.ment.Int:1}"></div>
-                            <div class="attr-row"><label>RAC</label><input type="number" id="cRac" value="${item?item.ment.Rac:1}"></div>
+                            <h5 class="neon-label" style="margin:0 0 8px 0; font-size:0.6rem;">MENTAIS</h5>
+                            <div class="attr-row"><label class="neon-label">PER</label><input type="number" id="cPer" value="${item?item.ment.Per:1}"></div>
+                            <div class="attr-row"><label class="neon-label">INT</label><input type="number" id="cInt" value="${item?item.ment.Int:1}"></div>
+                            <div class="attr-row"><label class="neon-label">RAC</label><input type="number" id="cRac" value="${item?item.ment.Rac:1}"></div>
                         </div>
                         <div class="attr-group">
-                            <h5 style="margin:0 0 5px 0; font-size:0.6rem; color:#800000;">VITAIS</h5>
-                            <div class="attr-row"><label>HUM</label><input type="number" id="vHum" value="${item?item.vitals.Hum:7}"></div>
-                            <div class="attr-row"><label>VON</label><input type="number" id="vVon" value="${item?item.vitals.Will:5}"></div>
+                            <h5 class="neon-label" style="margin:0 0 8px 0; font-size:0.6rem;">VITAIS</h5>
+                            <div class="attr-row"><label class="neon-label">HUM</label><input type="number" id="vHum" value="${item?item.vitals.Hum:7}"></div>
+                            <div class="attr-row"><label class="neon-label">VON</label><input type="number" id="vVon" value="${item?item.vitals.Will:5}"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="attr-group">
-                    <h5 style="margin:0 0 5px 0; font-size:0.6rem;">ADICIONAR HABILIDADE/ITEM</h5>
+                    <h5 class="neon-label" style="margin:0 0 8px 0; font-size:0.6rem;">HABILIDADE/ITEM</h5>
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="iName" placeholder="Nome" style="flex:2">
                         <input type="number" id="iVal" value="1" style="flex:1">
                         <select id="iType" style="flex:1"><option value="skill">HAB</option><option value="gear">ITEM</option></select>
-                        <button id="btnAddTemp" style="background:#444; color:#fff; border:none; padding:0 10px;">+</button>
+                        <button id="btnAddTemp" class="cmd-btn" style="width:40px; margin:0">+</button>
                     </div>
-                    <div id="previewList" style="font-size:0.6rem; margin-top:5px; color:#666;"></div>
+                    <div id="previewList" style="font-size:0.6rem; margin-top:5px; color:#ff0000; text-shadow:0 0 5px #ff0000;"></div>
                 </div>
 
-                <button class="cmd-btn" id="btnSaveChar">GRAVAR_NO_ZEUS</button>
-                <button class="cmd-btn" style="background:#222" onclick="window.closeModal()">ABORTAR</button>
+                <button class="cmd-btn" id="btnSaveChar">SINCRONIZAR_NA_REDE</button>
+                <button class="cmd-btn" style="background:#222; border-color:#444;" onclick="window.closeModal()">ABORTAR</button>
             `;
             document.getElementById('btnAddTemp').onclick = addToTemp;
             document.getElementById('btnSaveChar').onclick = saveCharacter;
         } else {
-            b.innerHTML = `<h3>[ NOVO_REGISTRO ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL_IMAGEM" value="${item?item.img:''}"><textarea id="gText" rows="10" placeholder="CONTEÚDO...">${item?item.text:''}</textarea><button class="cmd-btn" id="btnSaveGen">SINCRONIZAR</button><button class="cmd-btn" style="background:#222" onclick="window.closeModal()">CANCELAR</button>`;
+            b.innerHTML = `<h3 class="neon-label" style="font-size:1.1rem; margin-bottom:15px;">[ NOVO_ARQUIVO_ZEUS ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL_IMAGEM" value="${item?item.img:''}"><textarea id="gText" rows="10" placeholder="CONTEÚDO...">${item?item.text:''}</textarea><button class="cmd-btn" id="btnSaveGen">PUBLICAR_ARQUIVO</button><button class="cmd-btn" style="background:#222; border-color:#444;" onclick="window.closeModal()">CANCELAR</button>`;
             document.getElementById('btnSaveGen').onclick = saveGeneral;
         }
         document.getElementById('ctxModal').style.display = 'flex';
@@ -220,7 +228,7 @@
         const n = document.getElementById('iName').value, v = document.getElementById('iVal').value, t = document.getElementById('iType').value;
         if(n) { 
             if(t === 'skill') tempSkills.push({n, v}); else tempGear.push({n, v});
-            document.getElementById('previewList').innerHTML = `${tempSkills.length + tempGear.length} entradas pendentes...`;
+            document.getElementById('previewList').innerHTML = `> ${tempSkills.length + tempGear.length} ENTRADAS_PENDENTES`;
             document.getElementById('iName').value = ''; 
         }
     }
@@ -245,10 +253,9 @@
         persist(); window.closeModal();
     }
 
-    window.deleteItem = (idx) => { if(confirm("Apagar?")) { window.db[window.currentCat].splice(idx, 1); persist(); } };
-    window.clearCat = () => { if(confirm("Purgar arquivos desta aba?")) { window.db[window.currentCat] = []; persist(); } };
+    window.deleteItem = (idx) => { if(confirm("CONFIRMAR_PURGA_DE_DADOS?")) { window.db[window.currentCat].splice(idx, 1); persist(); } };
+    window.clearCat = () => { if(confirm("APAGAR_TODO_O_SETOR?")) { window.db[window.currentCat] = []; persist(); } };
 
-    // --- RENDER ---
     const getDots = (n, max=5) => "●".repeat(n) + "○".repeat(max - n);
     const obs = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('show', e.isIntersecting)), { threshold: 0.3 });
 
@@ -259,12 +266,12 @@
 
         data.forEach((item, i) => {
             const card = document.createElement('div'); card.className = 'sessao-card';
-            const controls = `<div class="card-controls"><div class="control-btn" onclick="window.openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red" onclick="window.deleteItem(${i})">X</div></div>`;
+            const controls = `<div class="card-controls"><div class="control-btn" onclick="window.openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red; border-color:red" onclick="window.deleteItem(${i})">X</div></div>`;
             
             if(window.currentCat === 'personagens') {
-                card.innerHTML = `${controls}<div style="display:flex; gap:15px; width:100%; max-width:800px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com/150'}"></div><div style="flex:1; text-align:left;"><h2 class="shimmer-text" style="margin:0;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="stat-row" style="margin-top:10px; color:#fff;"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div></div></div>`;
+                card.innerHTML = `${controls}<div style="display:flex; gap:15px; width:100%; max-width:800px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com/150'}"></div><div style="flex:1; text-align:left;"><h2 class="shimmer-text" style="margin:0;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="stat-row" style="margin-top:10px; color:#ff0000; text-shadow:0 0 5px #ff0000;"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div></div></div>`;
             } else {
-                card.innerHTML = `${controls}<div style="color:#800000; font-size:0.6rem;">[ ${item.date || '---'} ]</div><h2 class="shimmer-text">${item.title}</h2><div style="max-width:600px; font-size:0.8rem; border-left: 2px solid #800000; padding-left:10px; margin:15px 0;">${item.text.substring(0,150)}...</div><button class="cmd-btn" style="width:auto; padding:5px 20px;" onclick="window.openReadModal('${item.title}', '${item.text.replace(/\n/g, ' ')}')">ACESSAR</button>`;
+                card.innerHTML = `${controls}<div style="color:#ff0000; font-size:0.6rem; text-shadow: 0 0 5px #ff0000;">[ ${item.date || '---'} ]</div><h2 class="shimmer-text">${item.title}</h2><div style="max-width:600px; font-size:0.85rem; border-left: 2px solid #ff0000; padding-left:15px; margin:15px 0; color:#ddd; background:rgba(255,0,0,0.05); padding-top:10px; padding-bottom:10px;">${item.text.substring(0,180)}...</div><button class="cmd-btn" style="width:auto; padding:5px 25px;" onclick="window.openReadModal('${item.title}', '${item.text.replace(/\n/g, ' ')}')">DESCRIPTOGRAFAR</button>`;
             }
             f.prepend(card); obs.observe(card);
         });
@@ -274,7 +281,7 @@
 
     function createDNA() {
         const overlay = document.getElementById('dnaOverlay');
-        overlay.innerHTML = `<div class="dna-container"><div class="dna-strand" id="s1"></div><div class="dna-strand strand-2" id="s2"></div></div><div class="empty-state">ZEUS_AWAITING_DATA...</div>`;
+        overlay.innerHTML = `<div class="dna-container"><div class="dna-strand" id="s1"></div><div class="dna-strand strand-2" id="s2"></div></div><div class="empty-state" style="color:#ff0000; text-shadow: 0 0 10px #ff0000;">ZEUS_ONLINE_SYNCING...</div>`;
         const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
         for(let i=0; i<10; i++) {
             const d1 = document.createElement('div'); d1.className = 'dna-dot'; d1.style.transform = `translateZ(50px)`;
