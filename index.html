@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS_NOIR_V15_NEON_EDITION</title>
+    <title>ZEUS</title>
     <style>
         body { background-color: #0d0d0d; color: #b3b3b3; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; overflow-x: hidden; }
         
@@ -259,25 +259,98 @@
     const getDots = (n, max=5) => "●".repeat(n) + "○".repeat(max - n);
     const obs = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('show', e.isIntersecting)), { threshold: 0.3 });
 
-    function render() {
-        const f = document.getElementById('chronicleFeed'); f.innerHTML = '';
-        const data = window.db[window.currentCat] || [];
-        document.getElementById('dnaOverlay').style.display = data.length === 0 ? 'block' : 'none';
+   function render() {
+    const f = document.getElementById('chronicleFeed');
+    f.innerHTML = '';
+    const data = window.db[window.currentCat] || [];
 
-        data.forEach((item, i) => {
-            const card = document.createElement('div'); card.className = 'sessao-card';
-            const controls = `<div class="card-controls"><div class="control-btn" onclick="window.openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red; border-color:red" onclick="window.deleteItem(${i})">X</div></div>`;
-            
-            if(window.currentCat === 'personagens') {
-                card.innerHTML = `${controls}<div style="display:flex; gap:15px; width:100%; max-width:800px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com/150'}"></div><div style="flex:1; text-align:left;"><h2 class="shimmer-text" style="margin:0;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="stat-row" style="margin-top:10px; color:#ff0000; text-shadow:0 0 5px #ff0000;"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div></div></div>`;
-            } else {
-                card.innerHTML = `${controls}<div style="color:#ff0000; font-size:0.6rem; text-shadow: 0 0 5px #ff0000;">[ ${item.date || '---'} ]</div><h2 class="shimmer-text">${item.title}</h2><div style="max-width:600px; font-size:0.85rem; border-left: 2px solid #ff0000; padding-left:15px; margin:15px 0; color:#ddd; background:rgba(255,0,0,0.05); padding-top:10px; padding-bottom:10px;">${item.text.substring(0,180)}...</div><button class="cmd-btn" style="width:auto; padding:5px 25px;" onclick="window.openReadModal('${item.title}', '${item.text.replace(/\n/g, ' ')}')">DESCRIPTOGRAFAR</button>`;
-            }
-            f.prepend(card); obs.observe(card);
-        });
-    }
+    document.getElementById('dnaOverlay').style.display = data.length === 0 ? 'block' : 'none';
 
-    window.openReadModal = (title, text) => { document.getElementById('readTitle').innerText = title; document.getElementById('readFullText').innerText = text; document.getElementById('readModal').style.display = 'flex'; };
+    data.forEach((item, i) => {
+
+        const card = document.createElement('div');
+        card.className = 'sessao-card';
+
+        const controls = `
+            <div class="card-controls">
+                <div class="control-btn" onclick="window.openAddModal(${i})">EDIT</div>
+                <div class="control-btn" style="color:red; border-color:red" onclick="window.deleteItem(${i})">X</div>
+            </div>
+        `;
+
+        /* ============================= */
+        /* 🔴 PERSONAGENS E FIGURAS */
+        /* ============================= */
+        if (window.currentCat === 'personagens' || window.currentCat === 'figuras') {
+
+            card.innerHTML = `
+                ${controls}
+                <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
+                    
+                    <div class="img-container" style="width:220px; height:300px; cursor:pointer;">
+                        <img src="${item.img || 'https://via.placeholder.com/300x400'}">
+                    </div>
+
+                    <h2 class="shimmer-text" style="cursor:pointer;">${item.name || item.title || 'SEM_NOME'}</h2>
+
+                </div>
+            `;
+
+            card.onclick = (e) => {
+                if (e.target.classList.contains('control-btn')) return;
+
+                if (window.currentCat === 'personagens') {
+
+                    const ficha = `
+FÍSICOS
+${Object.entries(item.phys || {}).map(([k,v]) => `${k}: ${getDots(v)}`).join('\n')}
+
+SOCIAIS
+${Object.entries(item.soc || {}).map(([k,v]) => `${k}: ${getDots(v)}`).join('\n')}
+
+MENTAIS
+${Object.entries(item.ment || {}).map(([k,v]) => `${k}: ${getDots(v)}`).join('\n')}
+
+HUMANIDADE: ${getDots(item.vitals?.Hum || 0, 10)}
+                    `;
+
+                    window.openReadModal(item.name, ficha);
+
+                } else {
+                    window.openReadModal(item.title || item.name, item.text || '');
+                }
+            };
+
+        }
+
+        /* ============================= */
+        /* 🟢 CRÔNICA E RESTANTE */
+        /* ============================= */
+        else {
+
+            card.innerHTML = `
+                ${controls}
+                <div style="color:#ff0000; font-size:0.6rem; text-shadow: 0 0 5px #ff0000;">
+                    [ ${item.date || '---'} ]
+                </div>
+
+                <h2 class="shimmer-text">${item.title}</h2>
+
+                <div style="max-width:600px; font-size:0.85rem; border-left: 2px solid #ff0000; padding-left:15px; margin:15px 0; color:#ddd; background:rgba(255,0,0,0.05); padding-top:10px; padding-bottom:10px;">
+                    ${(item.text || '').substring(0,180)}...
+                </div>
+
+                <button class="cmd-btn" style="width:auto; padding:5px 25px;"
+                    onclick="window.openReadModal('${item.title}', '${(item.text || '').replace(/\n/g, ' ')}')">
+                    DESCRIPTOGRAFAR
+                </button>
+            `;
+        }
+
+        f.prepend(card);
+        obs.observe(card);
+    });
+}
 
     function createDNA() {
         const overlay = document.getElementById('dnaOverlay');
