@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS_NOIR_V15_FIXED_LAYOUT</title>
+    <title>ZEUS_NOIR_V15_FINAL_FIX</title>
     <style>
         body { background-color: #0d0d0d; color: #b3b3b3; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; overflow-x: hidden; }
         
@@ -26,6 +26,7 @@
         .dna-dot { width: 10px; height: 10px; background: #ff0000; border-radius: 50%; box-shadow: 0 0 15px #ff0000; }
         .strand-2 { animation-delay: -3s; }
         @keyframes rotateDNA { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        .empty-state { position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); color: #444; letter-spacing: 10px; font-size: 0.8rem; text-align: center; width: 100%; }
 
         /* --- INTERFACE --- */
         .menu-toggle { position: fixed; top: 20px; left: 20px; z-index: 2000; background: #800000; color: white; border: none; padding: 10px 15px; cursor: pointer; font-weight: bold; box-shadow: 3px 3px 0px #330000; }
@@ -50,14 +51,14 @@
         .stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; }
         .dots { color: #800000; }
 
-        /* --- MODAL FIX --- */
+        /* --- MODAL --- */
         .modal { display: none; position: fixed; z-index: 5000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
         .modal-content { background: #0a0a0a; border: 1px solid #800000; padding: 20px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
         
         .attr-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; border: 1px solid #222; padding: 10px; }
         .attr-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
         .attr-row label { font-size: 0.7rem; width: 40px; color: #800000; font-weight: bold; }
-        .attr-row input { width: 50px !important; text-align: center; }
+        .attr-row input { width: 60px !important; text-align: center; }
         
         input, textarea, select { background: #000; border: 1px solid #333; color: #fff; padding: 8px; width: 100%; margin-bottom: 5px; font-family: inherit; box-sizing: border-box; }
         .cmd-btn { background: #800000; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; font-weight: bold; }
@@ -70,24 +71,24 @@
 <div class="ruido-estatico"></div>
 <div id="dnaOverlay"></div>
 
-<button class="menu-toggle" onclick="toggleSidebar()">MENU</button>
+<button class="menu-toggle" onclick="window.toggleSidebar()">MENU</button>
 
 <div class="sidebar" id="sidebar">
-    <div style="color:#800000; font-size:1.1rem; margin-bottom:20px;">ZEUS_v15_FIRE</div>
+    <div style="color:#800000; font-size:1.1rem; margin-bottom:20px;">ZEUS_v15_CORE</div>
     <div class="sidebar-links">
-        <div onclick="changeCat('cronica')">> CRÔNICA</div>
-        <div onclick="changeCat('personagens')">> PERSONAGENS</div>
-        <div onclick="changeCat('projeto_zeus')">> PROJETO ZEUS</div>
-        <div onclick="changeCat('figuras')">> FIGURAS NOTÁVEIS</div>
-        <div onclick="changeCat('resistencia')">> A RESISTÊNCIA</div>
+        <div onclick="window.changeCat('cronica')">> CRÔNICA</div>
+        <div onclick="window.changeCat('personagens')">> PERSONAGENS</div>
+        <div onclick="window.changeCat('projeto_zeus')">> PROJETO ZEUS</div>
+        <div onclick="window.changeCat('figuras')">> FIGURAS NOTÁVEIS</div>
+        <div onclick="window.changeCat('resistencia')">> A RESISTÊNCIA</div>
         <hr style="border-color:#222; margin: 20px 0;">
-        <div onclick="clearCat()" style="font-size:0.7rem; opacity:0.4;">[ PURGAR_MEMÓRIA ]</div>
+        <div onclick="window.clearCat()" style="font-size:0.7rem; opacity:0.4;">[ PURGAR_MEMÓRIA ]</div>
     </div>
 </div>
 
 <div style="text-align:center; padding: 15px; border-bottom: 1px solid #1a1a1a;">
     <h3 class="shimmer-text" id="displayTitle" style="font-size: 1.5rem; letter-spacing: 5px;">CRÔNICA</h3>
-    <span class="add-trigger" onclick="openAddModal()">[ + ]</span>
+    <span class="add-trigger" onclick="window.openAddModal()">[ + ]</span>
 </div>
 
 <div class="carousel-vertical" id="chronicleFeed"></div>
@@ -121,9 +122,11 @@
     const fs = getFirestore(app);
 
     window.currentCat = 'cronica';
+    window.editingIdx = null;
     window.db = { cronica:[], personagens:[], projeto_zeus:[], figuras:[], resistencia:[] };
-    let tempSkills = [], tempGear = [], tempTraits = [];
+    let tempSkills = [], tempGear = [];
 
+    // --- FIREBASE SYNC ---
     const docRef = doc(fs, "sistema", "zeus_v15_data");
     onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
@@ -132,10 +135,19 @@
         } else { persist(); }
     });
 
-    async function persist() { await setDoc(doc(fs, "sistema", "zeus_v15_data"), window.db); }
+    async function persist() { await setDoc(docRef, window.db); }
 
+    // --- FUNÇÕES GLOBAIS (ANEXADAS AO WINDOW) ---
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
-    window.changeCat = (cat) => { window.currentCat = cat; document.getElementById('displayTitle').innerText = cat.toUpperCase(); render(); window.toggleSidebar(); };
+    
+    window.changeCat = (cat) => { 
+        window.currentCat = cat; 
+        document.getElementById('displayTitle').innerText = cat.toUpperCase(); 
+        render(); 
+        window.toggleSidebar(); 
+    };
+
+    window.closeModal = () => document.getElementById('ctxModal').style.display = 'none';
 
     window.openAddModal = (idx = null) => {
         window.editingIdx = idx;
@@ -145,7 +157,6 @@
         if(window.currentCat === 'personagens') {
             tempSkills = item ? [...item.skills] : [];
             tempGear = item ? [...item.gear] : [];
-            tempTraits = item ? [...item.traits] : [];
             
             b.innerHTML = `
                 <h3 style="color:#800000; font-size:0.9rem;">[ REGISTRO_DNA_PJ ]</h3>
@@ -194,12 +205,12 @@
                 </div>
 
                 <button class="cmd-btn" id="btnSaveChar">GRAVAR_NO_ZEUS</button>
-                <button class="cmd-btn" style="background:#222" onclick="closeModal()">ABORTAR</button>
+                <button class="cmd-btn" style="background:#222" onclick="window.closeModal()">ABORTAR</button>
             `;
             document.getElementById('btnAddTemp').onclick = addToTemp;
             document.getElementById('btnSaveChar').onclick = saveCharacter;
         } else {
-            b.innerHTML = `<h3>[ NOVO_REGISTRO ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL_IMAGEM" value="${item?item.img:''}"><textarea id="gText" rows="10" placeholder="CONTEÚDO...">${item?item.text:''}</textarea><button class="cmd-btn" id="btnSaveGen">SINCRONIZAR</button><button class="cmd-btn" style="background:#222" onclick="closeModal()">CANCELAR</button>`;
+            b.innerHTML = `<h3>[ NOVO_REGISTRO ]</h3><input type="text" id="gTitle" placeholder="TÍTULO" value="${item?item.title:''}"><input type="text" id="gImg" placeholder="URL_IMAGEM" value="${item?item.img:''}"><textarea id="gText" rows="10" placeholder="CONTEÚDO...">${item?item.text:''}</textarea><button class="cmd-btn" id="btnSaveGen">SINCRONIZAR</button><button class="cmd-btn" style="background:#222" onclick="window.closeModal()">CANCELAR</button>`;
             document.getElementById('btnSaveGen').onclick = saveGeneral;
         }
         document.getElementById('ctxModal').style.display = 'flex';
@@ -221,9 +232,8 @@
             phys: { For: document.getElementById('cFor').value, Des: document.getElementById('cDes').value, Vig: document.getElementById('cVig').value }, 
             soc: { Car: document.getElementById('cCar').value, Man: document.getElementById('cMan').value, Apa: document.getElementById('cApa').value }, 
             ment: { Per: document.getElementById('cPer').value, Int: document.getElementById('cInt').value, Rac: document.getElementById('cRac').value }, 
-            virt: { Con: 1, Aut: 1, Cor: 1 }, 
-            vitals: { Hum: document.getElementById('vHum').value, Will: document.getElementById('vVon').value, Cor: 0 }, 
-            skills: tempSkills, gear: tempGear, traits: [] 
+            vitals: { Hum: document.getElementById('vHum').value, Will: document.getElementById('vVon').value }, 
+            skills: tempSkills, gear: tempGear 
         };
         if(window.editingIdx !== null) window.db.personagens[window.editingIdx] = data; else window.db.personagens.push(data);
         persist(); window.closeModal();
@@ -236,8 +246,9 @@
     }
 
     window.deleteItem = (idx) => { if(confirm("Apagar?")) { window.db[window.currentCat].splice(idx, 1); persist(); } };
-    window.closeModal = () => document.getElementById('ctxModal').style.display = 'none';
+    window.clearCat = () => { if(confirm("Purgar arquivos desta aba?")) { window.db[window.currentCat] = []; persist(); } };
 
+    // --- RENDER ---
     const getDots = (n, max=5) => "●".repeat(n) + "○".repeat(max - n);
     const obs = new IntersectionObserver((es) => es.forEach(e => e.target.classList.toggle('show', e.isIntersecting)), { threshold: 0.3 });
 
@@ -248,12 +259,12 @@
 
         data.forEach((item, i) => {
             const card = document.createElement('div'); card.className = 'sessao-card';
-            const controls = `<div class="card-controls"><div class="control-btn" onclick="openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red" onclick="deleteItem(${i})">X</div></div>`;
+            const controls = `<div class="card-controls"><div class="control-btn" onclick="window.openAddModal(${i})">EDIT</div><div class="control-btn" style="color:red" onclick="window.deleteItem(${i})">X</div></div>`;
             
             if(window.currentCat === 'personagens') {
                 card.innerHTML = `${controls}<div style="display:flex; gap:15px; width:100%; max-width:800px; align-items:start;"><div class="img-container"><img src="${item.img || 'https://via.placeholder.com/150'}"></div><div style="flex:1; text-align:left;"><h2 class="shimmer-text" style="margin:0;">${item.name}</h2><div class="sheet-grid"><div class="category-box"><h4>FÍSICOS</h4>${Object.entries(item.phys).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>SOCIAIS</h4>${Object.entries(item.soc).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div><div class="category-box"><h4>MENTAIS</h4>${Object.entries(item.ment).map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="dots">${getDots(v)}</span></div>`).join('')}</div></div><div class="stat-row" style="margin-top:10px; color:#fff;"><span>HUMANIDADE</span><span class="dots">${getDots(item.vitals.Hum, 10)}</span></div></div></div>`;
             } else {
-                card.innerHTML = `${controls}<div style="color:#800000; font-size:0.6rem;">[ ${item.date || 'DATA_INDISPONÍVEL'} ]</div><h2 class="shimmer-text">${item.title}</h2><div style="max-width:600px; font-size:0.8rem; border-left: 2px solid #800000; padding-left:10px; margin:15px 0;">${item.text.substring(0,200)}...</div><button class="cmd-btn" style="width:auto; padding:5px 20px;" onclick="openReadModal('${item.title}', '${item.text.replace(/\n/g, ' ')}')">ACESSAR</button>`;
+                card.innerHTML = `${controls}<div style="color:#800000; font-size:0.6rem;">[ ${item.date || '---'} ]</div><h2 class="shimmer-text">${item.title}</h2><div style="max-width:600px; font-size:0.8rem; border-left: 2px solid #800000; padding-left:10px; margin:15px 0;">${item.text.substring(0,150)}...</div><button class="cmd-btn" style="width:auto; padding:5px 20px;" onclick="window.openReadModal('${item.title}', '${item.text.replace(/\n/g, ' ')}')">ACESSAR</button>`;
             }
             f.prepend(card); obs.observe(card);
         });
