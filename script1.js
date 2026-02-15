@@ -288,15 +288,18 @@ function generateDotInput(name, idPrefix, currentVal = 1) {
 function render() {
     const cronFeed = document.getElementById('chronicleFeed');
     const charFeed = document.getElementById('charFeed');
-    const data = window.db[window.currentCat] || [];
-
+    
+    // 1. Limpeza e Reset de Scroll
     if (cronFeed) cronFeed.innerHTML = '';
     if (charFeed) charFeed.innerHTML = '';
+    window.scrollTo(0, 0);
 
-    const isGrid = ['personagens', 'figuras', 'resistencia', 'projeto_zeus']
-        .includes(window.currentCat);
+    // 2. Definição da Categoria Atual
+    const data = window.db[window.currentCat] || [];
+    const isGrid = ['personagens', 'figuras', 'resistencia', 'projeto_zeus'].includes(window.currentCat);
 
     if (isGrid) {
+        // MODO GRID (Personagens/Cards)
         if (charFeed) charFeed.style.display = 'grid';
         if (cronFeed) cronFeed.style.display = 'none';
 
@@ -304,9 +307,8 @@ function render() {
             const block = document.createElement('div');
             block.className = 'char-block';
 
-            block.addEventListener('click', () =>
-                openReadModal(item, window.currentCat === 'personagens')
-            );
+            // Abre a visualização ao clicar no card
+            block.onclick = () => openReadModal(item, window.currentCat === 'personagens');
 
             block.innerHTML = `
                 <div class="char-controls">
@@ -314,24 +316,22 @@ function render() {
                     <span class="btn-delete" style="color:red">✕</span>
                 </div>
                 <div class="img-container">
-                    <img src="${item?.img || ''}"
-                         onerror="this.src='https://via.placeholder.com/150'">
+                    <img src="${item?.img || ''}" onerror="this.src='https://via.placeholder.com/150'">
                 </div>
                 <div class="char-name">
                     ${item?.name || item?.title || 'SEM NOME'}
                 </div>
             `;
 
-            block.querySelector('.btn-edit').onclick =
-                (e) => { e.stopPropagation(); openAddModal(idx); };
-
-            block.querySelector('.btn-delete').onclick =
-                (e) => { e.stopPropagation(); deleteItem(idx); };
+            // Botões de ação com stopPropagation para não abrir o modal sem querer
+            block.querySelector('.btn-edit').onclick = (e) => { e.stopPropagation(); openAddModal(idx); };
+            block.querySelector('.btn-delete').onclick = (e) => { e.stopPropagation(); deleteItem(idx); };
 
             charFeed?.appendChild(block);
         });
 
     } else {
+        // MODO CARROSSEL (Crônicas/Documentos)
         if (charFeed) charFeed.style.display = 'none';
         if (cronFeed) cronFeed.style.display = 'flex';
 
@@ -339,41 +339,28 @@ function render() {
             const card = document.createElement('div');
             card.className = 'chronicle-card';
 
-            const resumo = item?.text
-                ? item.text.substring(0, 140)
-                : '';
+            const resumo = item?.text ? item.text.substring(0, 140) : '';
 
             card.innerHTML = `
                 <div class="chronicle-actions">
                     <button class="ghost-btn btn-edit">EDITAR</button>
                     <button class="ghost-btn btn-delete">EXCLUIR</button>
                 </div>
-
-                <h4 class="chronicle-title">
-                    ${item?.title || 'SEM TÍTULO'}
-                </h4>
-
+                <h4 class="chronicle-title">${item?.title || 'SEM TÍTULO'}</h4>
                 <p class="chronicle-preview">
                     ${resumo}${resumo.length < (item?.text || '').length ? '...' : ''}
                 </p>
-
                 <button class="open-btn">ABRIR_ARQUIVO</button>
             `;
 
-            card.querySelector('.open-btn').onclick =
-                () => openReadModal(item, false);
+            card.querySelector('.open-btn').onclick = () => openReadModal(item, false);
+            card.querySelector('.btn-edit').onclick = (e) => { e.stopPropagation(); openAddModal(idx); };
+            card.querySelector('.btn-delete').onclick = (e) => { e.stopPropagation(); deleteItem(idx); };
 
-            card.querySelector('.btn-edit').onclick =
-                (e) => { e.stopPropagation(); openAddModal(idx); };
-
-            card.querySelector('.btn-delete').onclick =
-                (e) => { e.stopPropagation(); deleteItem(idx); };
-
-            cronFeed.appendChild(card);
+            cronFeed?.appendChild(card);
         });
     }
 }
-
 function deleteItem(idx) {
     if (!confirm('Confirma exclusão?')) return;
     const cat = window.currentCat;
