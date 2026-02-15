@@ -66,19 +66,31 @@ function openAddModal(idx = null) {
             <input type="text" id="cName" placeholder="NOME" value="${item?.name || ''}">
             <input type="text" id="cImg" placeholder="URL_AVATAR" value="${item?.img || ''}">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.6rem;">
-                <div>
-                    <h5 class="neon-label">FÍS/SOC</h5>
-                    <div class="modal-stat-row">FOR ${generateDotInput('for', 'cFor', item?.phys?.For)}</div>
-                    <div class="modal-stat-row">DES ${generateDotInput('des', 'cDes', item?.phys?.Des)}</div>
-                    <div class="modal-stat-row">CAR ${generateDotInput('car', 'cCar', item?.soc?.Car)}</div>
-                </div>
-                <div>
-                    <h5 class="neon-label">MEN/VIR</h5>
-                    <div class="modal-stat-row">INT ${generateDotInput('int', 'cInt', item?.ment?.Int)}</div>
-                    <div class="modal-stat-row">RAC ${generateDotInput('rac', 'cRac', item?.ment?.Rac)}</div>
-                    <div class="modal-stat-row">COR ${generateDotInput('cor', 'vCor', item?.virt?.Cor)}</div>
-                </div>
+            <div>
+              <h5 class="neon-label">FÍSICOS</h5>
+              <div class="modal-stat-row">FOR ${generateDotInput('for','cFor', item?.phys?.For)}</div>
+              <div class="modal-stat-row">DES ${generateDotInput('des','cDes', item?.phys?.Des)}</div>
+              <div class="modal-stat-row">VIG ${generateDotInput('vig','cVig', item?.phys?.Vig)}</div>
+          
+              <h5 class="neon-label" style="margin-top:10px;">SOCIAIS</h5>
+              <div class="modal-stat-row">CAR ${generateDotInput('car','cCar', item?.soc?.Car)}</div>
+              <div class="modal-stat-row">MAN ${generateDotInput('man','cMan', item?.soc?.Man)}</div>
+              <div class="modal-stat-row">APA ${generateDotInput('apa','cApa', item?.soc?.Apa)}</div>
             </div>
+          
+            <div>
+              <h5 class="neon-label">MENTAIS</h5>
+              <div class="modal-stat-row">INT ${generateDotInput('int','cInt', item?.ment?.Int)}</div>
+              <div class="modal-stat-row">RAC ${generateDotInput('rac','cRac', item?.ment?.Rac)}</div>
+              <div class="modal-stat-row">PER ${generateDotInput('per','cPer', item?.ment?.Per)}</div>
+          
+              <h5 class="neon-label" style="margin-top:10px;">VIRTUAIS</h5>
+              <div class="modal-stat-row">COR ${generateDotInput('cor','vCor', item?.virt?.Cor)}</div>
+              <div class="modal-stat-row">AUT ${generateDotInput('aut','vAut', item?.virt?.Aut)}</div>
+              <div class="modal-stat-row">CON ${generateDotInput('con','vCon', item?.virt?.Con)}</div>
+            </div>
+          </div>
+
             <h5 class="neon-label">PERÍCIAS</h5>
             <div id="skillsContainer" style="max-height:120px; overflow-y:auto; border:1px solid #222; padding:5px;"></div>
             <button class="cmd-btn" style="font-size:0.6rem; margin-top:5px;" id="btnAddNewSkill">+ NOVA PERÍCIA</button>
@@ -195,40 +207,67 @@ function openReadModal(item, isChar) {
     const getDots = (n) => "●".repeat(n || 0) + "○".repeat(5 - (n || 0));
 
     if (isChar) {
-        content.innerHTML = `
-            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px; font-size:0.8rem;">
-                <div>
-                    <h5 class="neon-label">ATRIBUTOS FÍSICOS</h5>
-                    <div>FOR: ${getDots(item?.phys?.For)}</div>
-                    <div>DES: ${getDots(item?.phys?.Des)}</div>
-                    <div>VIG: ${getDots(item?.phys?.Vig)}</div>
-                    <h5 class="neon-label" style="margin-top:15px;">ATRIBUTOS SOCIAIS</h5>
-                    <div>CAR: ${getDots(item?.soc?.Car)}</div>
-                    <div>MAN: ${getDots(item?.soc?.Man)}</div>
-                    <div>APA: ${getDots(item?.soc?.Apa)}</div>
-                </div>
-                <div>
-                    <h5 class="neon-label">ATRIBUTOS MENTAIS</h5>
-                    <div>INT: ${getDots(item?.ment?.Int)}</div>
-                    <div>RAC: ${getDots(item?.ment?.Rac)}</div>
-                    <div>PER: ${getDots(item?.ment?.Per)}</div>
-                    <h5 class="neon-label" style="margin-top:15px;">ATRIBUTOS VIRTUAIS</h5>
-                    <div>COR: ${getDots(item?.virt?.Cor)}</div>
-                    <div>AUT: ${getDots(item?.virt?.Aut)}</div>
-                    <div>CON: ${getDots(item?.virt?.Con)}</div>
+    content.innerHTML = `
+        <div style="display:grid; grid-template-columns: 120px 1fr; gap:20px; align-items:start;">
+
+            <div>
+                <img 
+                    src="${item?.img || 'https://via.placeholder.com/120'}"
+                    style="
+                        width:120px;
+                        height:160px;
+                        object-fit:cover;
+                        border:1px solid #800000;
+                        box-shadow:0 0 15px rgba(255,0,0,0.3);
+                    "
+                />
+            </div>
+
+            <div>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px; font-size:0.8rem;">
+                    <div>
+                        <h5 class="neon-label">ATRIBUTOS FÍSICOS</h5>
+                        <div>FOR: ${getDots(item?.phys?.For)}</div>
+                        <div>DES: ${getDots(item?.phys?.Des)}</div>
+                        <div>VIG: ${getDots(item?.phys?.Vig)}</div>
+
+                        <h5 class="neon-label" style="margin-top:15px;">ATRIBUTOS SOCIAIS</h5>
+                        <div>CAR: ${getDots(item?.soc?.Car)}</div>
+                        <div>MAN: ${getDots(item?.soc?.Man)}</div>
+                        <div>APA: ${getDots(item?.soc?.Apa)}</div>
+                    </div>
+
+                    <div>
+                        <h5 class="neon-label">ATRIBUTOS MENTAIS</h5>
+                        <div>INT: ${getDots(item?.ment?.Int)}</div>
+                        <div>RAC: ${getDots(item?.ment?.Rac)}</div>
+                        <div>PER: ${getDots(item?.ment?.Per)}</div>
+
+                        <h5 class="neon-label" style="margin-top:15px;">ATRIBUTOS VIRTUAIS</h5>
+                        <div>COR: ${getDots(item?.virt?.Cor)}</div>
+                        <div>AUT: ${getDots(item?.virt?.Aut)}</div>
+                        <div>CON: ${getDots(item?.virt?.Con)}</div>
+                    </div>
                 </div>
             </div>
-            <h5 class="neon-label" style="margin-top: 20px;">PERÍCIAS</h5>
-            <div style="font-size: 0.75rem; max-height: 120px; overflow-y: auto; border: 1px solid #222; padding: 5px; background: #111;">
-                ${(item?.skills && item.skills.length > 0) ? 
-                    item.skills.map(s => `<div>${s.n}: ${getDots(s.v)}</div>`).join('') 
-                    : 'Nenhuma perícia cadastrada'}
-            </div>
-            <p style="margin-top: 25px; border-top: 1px solid #222; padding-top: 15px; font-size: 0.8rem; line-height: 1.4;">
-                ${item?.biografia || 'Sem biografia.'}
-            </p>
-        `;
-    } else {
+        </div>
+
+        <h5 class="neon-label" style="margin-top:20px;">PERÍCIAS</h5>
+        <div style="font-size:0.75rem; max-height:120px; overflow-y:auto; border:1px solid #222; padding:5px; background:#111;">
+            ${
+              item?.skills?.length
+                ? item.skills.map(s => `<div>${s.n}: ${getDots(s.v)}</div>`).join('')
+                : 'Nenhuma perícia cadastrada'
+            }
+        </div>
+
+        <p style="margin-top:25px; border-top:1px solid #222; padding-top:15px; font-size:0.8rem; line-height:1.4;">
+            ${item?.biografia || 'Sem biografia.'}
+        </p>
+    `;
+}
+
+    else {
         content.innerHTML = `
             ${item?.img ? `<img src="${item.img}" style="width:100%; margin-bottom:15px;" />` : ''}
             <p style="font-size: 0.9rem; line-height: 1.5;">${item?.text || ''}</p>
