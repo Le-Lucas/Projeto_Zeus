@@ -758,3 +758,24 @@ input, textarea, select { background: #050505; border: 1px solid #330000; color:
     100% { transform: translateY(2px); }
 }
 
+#mainFeed {
+    position: relative;
+    width: 100%;
+    /* Altura total menos o header (ajuste os 80px conforme sua necessidade) */
+    min-height: calc(100vh - 80px); 
+    display: flex;
+    flex-direction: column;
+}
+
+/* Garante que o grid de personagens ocupe o topo quando ativado */
+.character-grid {
+    display: grid;
+    width: 100%;
+    padding-top: 20px;
+    justify-content: center;
+}
+
+/* O carrossel de crônicas não deve empurrar o grid se estiver oculto */
+.carousel-vertical:empty, .character-grid:empty {
+    display: none !important;
+}
