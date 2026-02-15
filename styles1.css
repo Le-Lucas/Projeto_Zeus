@@ -1,0 +1,760 @@
+/* --- BASE E CORES --- */
+body { 
+    background-color: #0d0d0d; 
+    color: #b3b3b3; 
+    font-family: 'Courier New', Courier, monospace; 
+    margin: 0; 
+    padding: 0; 
+    overflow-x: hidden; 
+}
+
+/* --- EFEITO SHIMMER --- */
+.shimmer-text {
+    text-transform: uppercase;
+    background: linear-gradient(to right, #444 20%, #ff0000 50%, #444 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: brilhoFluxo 4s linear infinite;
+}
+@keyframes brilhoFluxo { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
+/* --- DNA 3D --- */
+#dnaOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.dna-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 50px; perspective: 1000px; opacity: 0.15; }
+.dna-strand { display: flex; flex-direction: column; gap: 20px; animation: rotateDNA 6s linear infinite; transform-style: preserve-3d; }
+
+/* DNA Dots (Ajustado para o estilo original) */
+.dna-dot { 
+    width: 10px; 
+    height: 10px; 
+    background: #ff0000; 
+    border-radius: 50%; 
+    box-shadow: 0 0 15px #ff0000; 
+}
+.strand-2 { animation-delay: -3s; }
+@keyframes rotateDNA { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+
+.empty-state { 
+    position: absolute; 
+    top: 75%; left: 50%; 
+    transform: translate(-50%, -50%); 
+    color: #ff0000; 
+    text-shadow: 0 0 10px #ff0000; 
+    letter-spacing: 10px; 
+    font-size: 0.8rem; 
+    text-align: center; 
+    width: 100%; 
+}
+
+/* --- INTERFACE E SIDEBAR --- */
+.menu-toggle { 
+    position: fixed; top: 20px; left: 20px; z-index: 2000; 
+    background: #800000; color: white; border: none; 
+    padding: 10px 15px; cursor: pointer; font-weight: bold; 
+    box-shadow: 3px 3px 0px #330000; 
+}
+/* SIDEBAR BASE */
+.sidebar { 
+    position: fixed;
+    left: -280px;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: rgba(5, 5, 5, 0.98);
+    border-right: 2px solid #800000;
+    z-index: 1500;
+    transition: left 0.4s ease;
+    padding: 80px 20px 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* SIDEBAR ATIVA */
+.sidebar.active {
+    left: 0;
+}
+
+/* HEADER */
+.sidebar-header {
+    color: #ff0000;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #ff0000;
+}
+
+/* LINKS (APENAS ITENS DE MENU) */
+.sidebar-links > div[data-cat] {
+    color: #b3b3b3;
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-bottom: 1px solid #111;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.add-trigger { 
+    display: inline-block; margin-left: 15px; cursor: pointer; 
+    font-size: 1.8rem; color: #ff0000; text-shadow: 0 0 10px #ff0000; 
+    transition: 0.3s; vertical-align: middle; 
+}
+
+/* --- GRID DE PERSONAGENS --- */
+#charFeed {
+    margin-top: 30px;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 30px;
+    padding: 40px;
+    justify-items: center;
+    align-items: start;
+    z-index: 10;
+    position: relative;
+}
+.char-block {
+    width: 160px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.char-block:hover {
+    transform: scale(1.05) translateY(-10px);
+    filter: drop-shadow(0 0 15px #ff0000);
+}
+.char-name {
+    margin-top: 12px; font-size: 0.75rem; color: #fff; text-align: center;
+    letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #440000; padding-bottom: 5px;
+}
+
+/* --- CARDS E IMAGENS --- */
+
+.sessao-card {
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid #1a1a1a;
+    padding: 20px;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 0 15px #800000;
+    transition: box-shadow 0.3s ease;
+}
+
+.sessao-card:hover {
+    box-shadow: 0 0 25px #ff0000;
+}
+
+/* Limitar texto a 3 linhas com ellipsis */
+.sessao-card p {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* limita a 3 linhas */
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    line-height: 1.4em;
+    max-height: calc(1.4em * 3); /* confirma cálculo altura */
+    margin-top: 10px;
+    color: #ccc;
+}
+
+.carousel-vertical { height: 100vh; overflow-y: scroll; scrollbar-width: none; position: relative; z-index: 10; }
+.img-container { width: 160px; height: 220px; border: 1px solid #800000; overflow: hidden; background: #000; position: relative; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(50%); transition: 0.3s; }
+
+/* --- SISTEMA DE DOTS (SISTEMA WoD/RPG) --- */
+.wod-dots-input {
+    display: flex;
+    flex-direction: row-reverse; /* Inverte para que a seleção da esquerda preencha as bolinhas */
+    justify-content: flex-end;
+}
+.wod-dots-input input { display: none; }
+.wod-dots-input label {
+    width: 12px;
+    height: 12px;
+    background: transparent;
+    border: 1px solid #ff0000;
+    border-radius: 50%;
+    margin-left: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+/* Efeito de preenchimento neon */
+.wod-dots-input input:checked ~ label,
+.wod-dots-input label:hover,
+.wod-dots-input label:hover ~ label {
+    background: #ff0000;
+    box-shadow: 0 0 8px #ff0000;
+}
+
+/* --- MODAIS --- */
+.modal { display: none; position: fixed; z-index: 5000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+.modal-content { background: #0a0a0a; border: 1px solid #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); padding: 25px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; }
+.modal-stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.75rem; color: #ddd; }
+
+.neon-label { font-size: 0.7rem; color: #ff3333; text-shadow: 0 0 8px #ff0000; font-weight: bold; text-transform: uppercase; display: block; margin: 10px 0 5px; }
+
+input, textarea, select { background: #050505; border: 1px solid #330000; color: #fff; padding: 12px; width: 100%; margin-bottom: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.8rem; }
+.cmd-btn { background: #440000; color: white; border: 1px solid #ff0000; padding: 12px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; text-shadow: 0 0 5px #000; transition: 0.3s; letter-spacing: 2px; }
+.cmd-btn:hover { background: #ff0000; box-shadow: 0 0 20px #ff0000; }
+
+/* --- UTILITÁRIOS --- */
+.ruido-estatico { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.03; z-index: 9999; pointer-events: none; }
+
+@media (max-width: 600px) {
+    .character-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+    .char-block, .img-container { width: 140px; }
+}
+.char-block {
+    position: relative; /* Necessário para posicionar os controles */
+}
+
+.char-controls {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    opacity: 0.3; /* Fica bem discreto */
+    transition: opacity 0.3s;
+}
+
+.char-block:hover .char-controls {
+    opacity: 1; /* Aparece ao passar o mouse */
+}
+
+.char-controls span {
+    cursor: pointer;
+    font-size: 0.7rem;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 5px;
+    border: 1px solid #333;
+    border-radius: 2px;
+}
+
+.char-controls span:hover {
+    border-color: #800000;
+    background: #111;
+}
+
+/* Container do Dado */
+.dice-scene {
+    width: 60px;
+    height: 60px;
+    margin: 20px auto;
+    perspective: 600px;
+}
+
+.cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+/* Faces do Dado */
+.cube__face {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #800000;
+    line-height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    background: rgba(10, 0, 0, 0.9);
+    box-shadow: inset 0 0 10px #800000;
+}
+/*alteração 13/02/2026*/
+#diceConsole {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 180px;
+    background: rgba(5, 5, 5, 0.95);
+    border: 1px solid #800000;
+    padding: 15px;
+    z-index: 9999; /* Garante que fique acima de tudo */
+    box-shadow: 0 0 20px rgba(128, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Estilo para as faces do dado que você já tem */
+.dice-scene {
+    width: 60px;
+    height: 60px;
+    margin: 15px auto;
+    perspective: 600px;
+}
+/* ... mantenha o restante do CSS do cubo que enviamos anteriormente ... */
+/* Posicionamento 3D das Faces */
+.cube__face--1 { transform: rotateY(  0deg) translateZ(30px); }
+.cube__face--2 { transform: rotateY( 90deg) translateZ(30px); }
+.cube__face--3 { transform: rotateY(180deg) translateZ(30px); }
+.cube__face--4 { transform: rotateY(-90deg) translateZ(30px); }
+.cube__face--5 { transform: rotateX( 90deg) translateZ(30px); }
+.cube__face--6 { transform: rotateX(-90deg) translateZ(30px); }
+
+/* Animação de "Giro" Aleatório */
+@keyframes rolling {
+    from { transform: rotateX(0deg) rotateY(0deg); }
+    to { transform: rotateX(360deg) rotateY(720deg); }
+}
+
+.is-rolling {
+    animation: rolling 0.5s linear infinite;
+}
+/* Efeito de Reflexo e Scanlines Holográficas */
+.char-block {
+    position: relative;
+    overflow: hidden;
+    background: #0a0a0a; /* Fundo sólido para destacar o brilho */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #333;
+}
+
+/* Camada 1: O Brilho (Overlay Holographic) */
+.char-block::before {
+    content: "";
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 0, 0, 0.05) 45%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 0, 0, 0.05) 55%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Camada 2: Linhas de Escaneamento (Scanlines) */
+.char-block::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.3;
+}
+
+/* Comportamento ao passar o mouse (Hover) */
+.char-block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(128, 0, 0, 0.5);
+    border-color: #800000;
+}
+
+.char-block:hover::before {
+    top: -50%;
+    left: -50%;
+}
+/* Ajuste de Contraste dentro do Card */
+.char-block .img-container img {
+    filter: grayscale(0.8) contrast(1.5); /* Fica mais "cru" e dramático */
+    transition: filter 0.4s ease;
+    display: block;
+    width: 100%;
+}
+
+.char-block:hover .img-container img {
+    filter: grayscale(0) contrast(1.1); /* Recupera a cor e suaviza o contraste */
+}
+
+.carousel-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 80vh; /* Ajuste conforme necessário */
+    scrollbar-width: thin;
+    scrollbar-color: #800000 #000;
+}
+
+.sessao-card {
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid #1a1a1a;
+    padding: 20px;
+    border-radius: 4px;
+    position: relative;
+}
+
+/* Isso garante que os efeitos visuais não bloqueiem o mouse */
+.char-block::before, 
+.char-block::after {
+    pointer-events: none !important;
+    z-index: 1; /* Camada baixa */
+}
+
+/* Isso garante que o container aceite cliques */
+.char-block {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 5;
+}
+
+/* Isso garante que as imagens e textos não "roubem" o clique do pai */
+.char-block .img-container, 
+.char-block .char-name, 
+.char-block img {
+    pointer-events: none !important;
+}
+
+/* Isso garante que os controles de admin fiquem NO TOPO de tudo */
+.char-controls {
+    pointer-events: auto !important;
+    z-index: 100 !important;
+}
+
+.char-controls span {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+.char-block::before; 
+.char-block::after;
+.holographic-glitch;
+.ruido-estatico {
+    pointer-events: none !important;
+}
+
+/* Garante que o card receba o clique */
+.char-block {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Garante que os botões de EDITAR e EXCLUIR fiquem no topo de tudo */
+.char-controls {
+    pointer-events: auto !important;
+    z-index: 999 !important;
+}
+
+.char-controls span {
+    pointer-events: auto !important;
+    display: inline-block;
+    padding: 5px; /* Aumenta a área de clique do botão */
+}
+
+/* Centraliza os cards de crônica no carrossel vertical */
+.carousel-vertical {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* Ajuste de altura automática para não cortar */
+.char-block {
+    width: 170px; /* Levemente mais largo */
+    min-height: 260px; /* Altura mínima, mas pode crescer */
+    background: #050505;
+    border: 1px solid #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+/* Garante que a imagem mantenha a proporção e não empurre tudo */
+.img-container {
+    width: 100%;
+    height: 200px; /* Fixamos a imagem, o texto vem abaixo */
+    overflow: hidden;
+    border-bottom: 1px solid #222;
+}
+
+/* Botões de Personagem mais limpos */
+.char-controls {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    opacity: 0; /* Invisível por padrão */
+    transition: 0.3s;
+}
+
+.char-block:hover .char-controls {
+    opacity: 1; /* Aparece no hover */
+}
+
+.char-controls span {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #800000;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    color: #fff;
+}
+.carousel-vertical {
+    height: 100vh;          /* ocupa toda a altura da viewport */
+    overflow-y: auto;       /* scroll vertical */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    scrollbar-width: thin;  /* scroll adaptado */
+    scrollbar-color: #800000 #000;
+}
+.carousel-vertical {
+    height: 100vh;           /* toda altura da tela */
+    overflow-y: auto;
+}
+/* ===============================
+   BOTÕES – CRÔNICAS (ZEUS UI)
+   =============================== */
+
+.open-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 8px 0;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid #222;
+    cursor: pointer;
+
+    /* shimmer reaproveitado */
+    background: linear-gradient(
+        to right,
+        #444 20%,
+        #ff0000 50%,
+        #444 80%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: brilhoFluxo 4s linear infinite;
+}
+
+.open-btn:hover {
+    border-color: #ff0000;
+    letter-spacing: 4px;
+    transition: 0.2s ease;
+}
+
+/* ===============================
+   BOTÕES FANTASMA (EDITAR / EXCLUIR)
+   =============================== */
+
+.ghost-btn {
+    background: none;
+    border: none;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    opacity: 0.4;
+    color: #888;
+    padding: 0;
+    text-transform: uppercase;
+}
+
+.chronicle-card:hover .ghost-btn {
+    opacity: 1;
+}
+
+.ghost-btn:hover {
+    background: linear-gradient(
+        to right,
+        #444 20%,
+        #ff0000 50%,
+        #444 80%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: brilhoFluxo 2.5s linear infinite;
+}
+/* ===============================
+   AÇÕES SUPERIORES – CRÔNICAS
+   =============================== */
+
+.chronicle-card {
+    position: relative;
+}
+
+.chronicle-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.chronicle-card:hover .chronicle-actions {
+    opacity: 1;
+}
+
+.icon-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.65rem;
+    line-height: 1;
+    border: 1px solid #222;
+    background: rgba(0,0,0,0.6);
+    color: #777;
+    cursor: pointer;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    border-color: #ff0000;
+
+    background: linear-gradient(
+        to right,
+        #444 20%,
+        #ff0000 50%,
+        #444 80%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: brilhoFluxo 2.5s linear infinite;
+}
+
+.btn-delete:hover {
+    border-color: #ff0000;
+}
+/* ===============================
+   BOTÃO ABRIR ARQUIVO
+   =============================== */
+
+.open-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 8px 0;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-align: center;
+    cursor: pointer;
+
+    background: linear-gradient(
+        to right,
+        #444 20%,
+        #ff0000 50%,
+        #444 80%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    border: 1px solid #222;
+    animation: brilhoFluxo 4s linear infinite;
+}
+
+.open-btn:hover {
+    border-color: #ff0000;
+    letter-spacing: 5px;
+    transition: 0.2s ease;
+}
+/* ===== HOVER HOLOGRAPHIC OVERLAY ===== */
+.sidebar-links div {
+    position: relative;
+    overflow: hidden;
+    padding: 12px 15px; /* Ajuste para dar respiro ao efeito */
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+}
+
+/* Camada Holográfica (Brilho e Cor) */
+.sidebar-links div::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Gradiente iridescente sutil */
+    background: linear-gradient(
+        110deg,
+        rgba(255, 0, 0, 0) 0%,
+        rgba(255, 0, 0, 0.2) 20%,
+        rgba(255, 255, 255, 0.4) 45%,
+        rgba(255, 0, 0, 0.2) 70%,
+        rgba(255, 0, 0, 0) 100%
+    );
+    background-size: 200% 100%;
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* Camada de Scanlines (Linhas de Dados) */
+.sidebar-links div::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.05) 0px,
+        rgba(255, 255, 255, 0.05) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.sidebar-links div:hover {
+    color: #ffffff;
+    background: rgba(40, 0, 0, 0.5);
+    border-left: 2px solid #ff0000;
+    padding-left: 25px; /* Deslocamento suave ao focar */
+    text-shadow: 
+        1px 1px 2px rgba(255, 0, 0, 0.8),
+        -1px -1px 2px rgba(0, 255, 255, 0.3); /* Aberração cromática leve */
+    box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.2);
+}
+
+.sidebar-links div:hover::before {
+    opacity: 1;
+    animation: holoSweep 1.5s linear infinite;
+}
+
+.sidebar-links div:hover::after {
+    opacity: 1;
+    animation: scanLines 0.2s linear infinite;
+}
+
+/* Animação do Brilho Atravessando */
+@keyframes holoSweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Animação de Jitter das Linhas */
+@keyframes scanLines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(2px); }
+}
+
