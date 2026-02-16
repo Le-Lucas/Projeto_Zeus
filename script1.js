@@ -84,7 +84,7 @@ function openAddModal(idx = null) {
               <div class="modal-stat-row">RAC ${generateDotInput('rac','cRac', item?.ment?.Rac)}</div>
               <div class="modal-stat-row">PER ${generateDotInput('per','cPer', item?.ment?.Per)}</div>
           
-              <h5 class="neon-label" style="margin-top:10px;">VIRTUAIS</h5>
+              <h5 class="neon-label" style="margin-top:10px;">VIRTUDES</h5>
               <div class="modal-stat-row">COR ${generateDotInput('cor','vCor', item?.virt?.Cor)}</div>
               <div class="modal-stat-row">AUT ${generateDotInput('aut','vAut', item?.virt?.Aut)}</div>
               <div class="modal-stat-row">CON ${generateDotInput('con','vCon', item?.virt?.Con)}</div>
